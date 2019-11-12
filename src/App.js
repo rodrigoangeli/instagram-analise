@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 import React, { Component } from "react";
 //import { Tabs, useTabState, usePanelState } from "@bumaga/tabs";
 import ComponentWrapper from "./ComponentWrapper";
@@ -8,7 +9,8 @@ import { orderBy } from "lodash";
 import { FaSort } from 'react-icons/fa';
 import Select from 'react-select';
 
-
+let verbojuridico = []
+let cers = []
 class App extends Component {
   constructor(props) {
     super(props);
@@ -28,6 +30,7 @@ class App extends Component {
   
   handleChange(e){
     this.setState({
+      dataAtual: cers,
       tech: e.target.value
     })
   }
@@ -119,25 +122,27 @@ class App extends Component {
     
     return (
       <div className="container-fluid">
-         <select id="lang" onChange={this.handleChange.bind(this)} value={this.state.tech}>
-          <option value="select">Select a technology</option>
-          <option value="Angular">Angular</option>
-          <option value="Bootstrap">Bootstrap</option>
-          <option value="React">React</option>
+         <select className="mb-2 mt-2 form-control-lg form-control" id="lang" onChange={this.handleChange.bind(this)} value={this.state.tech}>
+          <option value="select">Selecione o @</option>
+          <option value="cers">@verbojuridico</option>
+          <option value="Bootstrap">@cers</option>
+          <option value="React">@ceisc_</option>
         </select>
         <h2>{this.state.tech}</h2>
         <Files
           className="files-dropzone"
           onChange={files => {
+
             for(let i = 0;i < files.length;i++){
               this.fileReader = new FileReader();
               this.fileReader.readAsText(files[i]);
               this.fileReader.onload = event => {
                 let json = JSON.parse(event.target.result)
                 scope['grupo'+i] = json;
+                verbojuridico = scope.grupo0;
+                cers = scope.grupo1;
                 this.setState({
-                  dataAtual: scope.grupo0,
-                  dataAtual2: scope.grupo1,
+                  dataAtual: scope.grupo0
                 },() => {
                     console.log(this.state.dataAtual)
                     console.log(this.state.dataAtual2);
@@ -153,7 +158,7 @@ class App extends Component {
                   })
               };
             }
-           
+       
           }}
           onError={err => console.log(err)}
           accepts={[".json"]}
