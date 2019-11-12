@@ -32,9 +32,10 @@ class App extends Component {
   }
   
   handleChange(e){
+    console.log('target',e.target.id);
     //banana[0].name,
     this.setState({
-      dataAtual: banana[e.target.value].name
+      dataAtual: banana[e.target.key].name
     })
   }
 
@@ -122,7 +123,7 @@ class App extends Component {
     ))
 
     let opcoesSelect =  this.state.nomesJSON.map((e, key) => {
-      return <option key={key} value={e.value}>{e.name}</option>;
+      return <option key={key} id={key} value={e.value}>{e.value}</option>;
       })
     
     return (
@@ -143,13 +144,16 @@ class App extends Component {
                   data: json
                 };*/
                 let nomeArquivo = files[i].name.replace(".json", "");
-                banana.push({ value: i, name: json });
-                limao.push({ value: i, name: nomeArquivo });
+                banana.push({ value: nomeArquivo, name: json });
+                //limao.push({ value: i, name: nomeArquivo });
                  
                 this.setState({
                   dataAtual: banana[0].name,
-                  nomesJSON: limao,
+                  nomesJSON: banana,
                 },() => {
+                  
+                  console.log('nomesJSON',this.state.nomesJSON);
+
                     /*var msg = '#yeah alter #wow #cool dadadda';
                     const result = this.state.dataAtual.concat(
                       msg
