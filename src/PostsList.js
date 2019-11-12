@@ -14,7 +14,6 @@ const ComponentWrapper = (props) => {
             <td>
             <HideUntilLoaded
   imageToLoad={props.src}
-  Spinner={() => <div>Carregando...</div>}
 >
 <img
                 width="50px"

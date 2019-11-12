@@ -62,12 +62,11 @@ class App extends Component {
   
  render() {
     const { dataAtual, currentPage, todosPerPage } = this.state;
-    const scope = {};
+    const grupo = {};
         // Logic for displaying current todos
         const indexOfLastTodo = currentPage * todosPerPage;
         const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
         const currentTodos = dataAtual.slice(indexOfFirstTodo, indexOfLastTodo);
-
         // Logic for displaying page numbers
         const pageNumbers = [];
         for (let i = 1; i <= Math.ceil(dataAtual.length / todosPerPage); i++) {
@@ -77,11 +76,11 @@ class App extends Component {
         const renderPageNumbers = pageNumbers.map(number => {
           return (
             <li className="page-item"
+            >
+              <span className="page-link"
               key={number}
               id={number}
-              onClick={this.handleClick.bind(this)}
-            >
-              <span className="page-link">
+              onClick={this.handleClick.bind(this)}>
               {number}
               </span>
             </li>
@@ -138,14 +137,16 @@ class App extends Component {
               this.fileReader.readAsText(files[i]);
               this.fileReader.onload = event => {
                 let json = JSON.parse(event.target.result)
-                scope['grupo'+i] = json;
-                verbojuridico = scope.grupo0;
-                cers = scope.grupo1;
+                let nomeInsta = files[i].name;
+                grupo[files[i].name] = json;
+                
+                verbojuridico = grupo[files[0].name];
+                cers = grupo[files[1].name];
                 this.setState({
-                  dataAtual: scope.grupo0
+                  dataAtual: grupo[files[0].name]
                 },() => {
-                    console.log(this.state.dataAtual)
-                    console.log(this.state.dataAtual2);
+                    console.log(verbojuridico)
+                    console.log(cers);
                     /*var msg = '#yeah alter #wow #cool dadadda';
                     const result = this.state.dataAtual.concat(
                       msg
