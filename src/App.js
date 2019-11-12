@@ -9,14 +9,18 @@ import { orderBy } from "lodash";
 import { FaSort } from 'react-icons/fa';
 import Select from 'react-select';
 
-let verbojuridico = []
-let cers = []
+let banana = [];
+let limao = [];
+/*[
+    { value: 'USA', name: 'USA' },
+    { value: 'CANADA', name: 'CANADA' }            
+];*/
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       dataAtual: [],
-      ceisc: [],
+      nomesJSON: [],
       publicacoes: 3002,
       seguidores: 48421,
       seguindo: 483,
@@ -24,14 +28,13 @@ class App extends Component {
       currentPage: 1,
       todosPerPage: 35,
       selectedOptions: null,
-    };
-    
+    };    
   }
   
   handleChange(e){
+    //banana[0].name,
     this.setState({
-      dataAtual: cers,
-      tech: e.target.value
+      dataAtual: banana[e.target.value].name
     })
   }
 
@@ -62,7 +65,6 @@ class App extends Component {
   
  render() {
     const { dataAtual, currentPage, todosPerPage } = this.state;
-    const grupo = {};
         // Logic for displaying current todos
         const indexOfLastTodo = currentPage * todosPerPage;
         const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
@@ -118,35 +120,36 @@ class App extends Component {
                         />
                       </tr>
     ))
+
+    let opcoesSelect =  this.state.nomesJSON.map((e, key) => {
+      return <option key={key} value={e.value}>{e.name}</option>;
+      })
     
     return (
       <div className="container-fluid">
          <select className="mb-2 mt-2 form-control-lg form-control" id="lang" onChange={this.handleChange.bind(this)} value={this.state.tech}>
-          <option value="select">Selecione o @</option>
-          <option value="cers">@verbojuridico</option>
-          <option value="Bootstrap">@cers</option>
-          <option value="React">@ceisc_</option>
+        {opcoesSelect}
         </select>
-        <h2>{this.state.tech}</h2>
         <Files
           className="files-dropzone"
           onChange={files => {
-
             for(let i = 0;i < files.length;i++){
               this.fileReader = new FileReader();
               this.fileReader.readAsText(files[i]);
               this.fileReader.onload = event => {
-                let json = JSON.parse(event.target.result)
-                let nomeInsta = files[i].name;
-                grupo[files[i].name] = json;
-                
-                verbojuridico = grupo[files[0].name];
-                cers = grupo[files[1].name];
+                let json = JSON.parse(event.target.result);
+               /* grupo[files[i].name] = json;
+                opcoesObj['"'+files[i].name+'"'] = {
+                  data: json
+                };*/
+                let nomeArquivo = files[i].name.replace(".json", "");
+                banana.push({ value: i, name: json });
+                limao.push({ value: i, name: nomeArquivo });
+                 
                 this.setState({
-                  dataAtual: grupo[files[0].name]
+                  dataAtual: banana[0].name,
+                  nomesJSON: limao,
                 },() => {
-                    console.log(verbojuridico)
-                    console.log(cers);
                     /*var msg = '#yeah alter #wow #cool dadadda';
                     const result = this.state.dataAtual.concat(
                       msg
@@ -156,10 +159,10 @@ class App extends Component {
                     console.log(result);*/
                     this.state.dataAtual.map(data => {data.shortcode_media.taxaEngajamento = (data.shortcode_media.edge_media_preview_like.count + data.shortcode_media.edge_media_preview_comment.count)/this.state.publicacoes * 100; return data;});
                     
-                  })
+                  })              
               };
             }
-       
+            
           }}
           onError={err => console.log(err)}
           accepts={[".json"]}
