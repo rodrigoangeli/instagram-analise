@@ -21,21 +21,23 @@ class App extends Component {
     this.state = {
       dataAtual: [],
       nomesJSON: [],
-      publicacoes: 3002,
-      seguidores: 48421,
-      seguindo: 483,
-      sortParams: {direction: undefined},
+      publicacoes: null,
+      seguidores: null,
+      seguindo: null,
+      sortParams: { direction: undefined },
       currentPage: 1,
       todosPerPage: 35,
       selectedOptions: null,
-    };    
+    };
   }
-  
-  handleChange(e){
-    console.log('target',e.target.id);
+
+  handleChange(e) {
+    var index = e.target.selectedIndex;
+    var optionElement = e.target.childNodes[index]
+    var option = optionElement.getAttribute('id');
     //banana[0].name,
     this.setState({
-      dataAtual: banana[e.target.key].name
+      dataAtual: banana[option].name
     })
   }
 
@@ -52,7 +54,7 @@ class App extends Component {
     } = this.state;
     // Check, what direction now should be
     const sortDirection = direction === "desc" ? "asc" : "desc";
-  // Sort dataAtual  
+    // Sort dataAtual  
     const sortedCollection = orderBy(dataAtual, [sortKey], [sortDirection]);
     //Update component state with new data
     this.setState({
@@ -63,32 +65,32 @@ class App extends Component {
     });
   }
 
-  
- render() {
-    const { dataAtual, currentPage, todosPerPage } = this.state;
-        // Logic for displaying current todos
-        const indexOfLastTodo = currentPage * todosPerPage;
-        const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
-        const currentTodos = dataAtual.slice(indexOfFirstTodo, indexOfLastTodo);
-        // Logic for displaying page numbers
-        const pageNumbers = [];
-        for (let i = 1; i <= Math.ceil(dataAtual.length / todosPerPage); i++) {
-          pageNumbers.push(i);
-        }
 
-        const renderPageNumbers = pageNumbers.map(number => {
-          return (
-            <li className="page-item"
-            >
-              <span className="page-link"
-              key={number}
-              id={number}
-              onClick={this.handleClick.bind(this)}>
-              {number}
-              </span>
-            </li>
-          );
-        });
+  render() {
+    const { dataAtual, currentPage, todosPerPage } = this.state;
+    // Logic for displaying current todos
+    const indexOfLastTodo = currentPage * todosPerPage;
+    const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
+    const currentTodos = dataAtual.slice(indexOfFirstTodo, indexOfLastTodo);
+    // Logic for displaying page numbers
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(dataAtual.length / todosPerPage); i++) {
+      pageNumbers.push(i);
+    }
+
+    const renderPageNumbers = pageNumbers.map((number, i) => {
+      return (
+        <li key={i} className="page-item"
+        >
+          <span className="page-link"
+            key={number}
+            id={number}
+            onClick={this.handleClick.bind(this)}>
+            {number}
+          </span>
+        </li>
+      );
+    });
 
     let renderizada = this.state.dataAtual.map((data, index) => (
       <tr key={data.shortcode_media.id}>
@@ -103,70 +105,67 @@ class App extends Component {
 
     let publicacoes = currentTodos.map((data, index) => (
       <tr key={index}>
-                        <PostsList
-                          id={index+1}
-                          link={'https://www.instagram.com/p/' + data.shortcode_media.shortcode}
-                          tipo={data.shortcode_media.__typename === "GraphImage" ? 'Foto' : data.shortcode_media.__typename  === "GraphVideo" ? 'Video' : 'Carrossel'}
-                          descricao={(data.shortcode_media.edge_media_to_caption.edges[0].node.text).substring(0, 50) + '..'}
-                          horario={new Date(
-                            data.shortcode_media.taken_at_timestamp * 1000
-                          ).toLocaleTimeString()}
-                          dia={new Date(
-                            data.shortcode_media.taken_at_timestamp * 1000
-                          ).toLocaleDateString()}
-                          src={data.shortcode_media.display_url}
-                          taxaEngajamento={((data.shortcode_media.edge_media_preview_like.count + data.shortcode_media.edge_media_preview_comment.count) / this.state.publicacoes * 100).toFixed(2) + '%'}
-                          likesPost={data.shortcode_media.edge_media_preview_like.count}
-                          comentarios={data.shortcode_media.edge_media_preview_comment.count}
-                        />
-                      </tr>
+        <PostsList
+          id={index + 1}
+          link={'https://www.instagram.com/p/' + data.shortcode_media.shortcode}
+          tipo={data.shortcode_media.__typename === "GraphImage" ? 'Foto' : data.shortcode_media.__typename === "GraphVideo" ? 'Video' : 'Carrossel'}
+          descricao={(data.shortcode_media.edge_media_to_caption.edges[0].node.text).substring(0, 50) + '..'}
+          horario={new Date(
+            data.shortcode_media.taken_at_timestamp * 1000
+          ).toLocaleTimeString()}
+          dia={new Date(
+            data.shortcode_media.taken_at_timestamp * 1000
+          ).toLocaleDateString()}
+          src={data.shortcode_media.display_url}
+          taxaEngajamento={((data.shortcode_media.edge_media_preview_like.count + data.shortcode_media.edge_media_preview_comment.count) / this.state.seguidores * 100).toFixed(2) + '%'}
+          likesPost={data.shortcode_media.edge_media_preview_like.count}
+          comentarios={data.shortcode_media.edge_media_preview_comment.count}
+        />
+      </tr>
     ))
 
-    let opcoesSelect =  this.state.nomesJSON.map((e, key) => {
+    let opcoesSelect = this.state.nomesJSON.map((e, key) => {
       return <option key={key} id={key} value={e.value}>{e.value}</option>;
-      })
-    
+    })
+
     return (
       <div className="container-fluid">
-         <select className="mb-2 mt-2 form-control-lg form-control" id="lang" onChange={this.handleChange.bind(this)} value={this.state.tech}>
-        {opcoesSelect}
+        <select className="mb-2 mt-2 form-control-lg form-control" onChange={this.handleChange.bind(this)}>
+          {opcoesSelect}
         </select>
         <Files
           className="files-dropzone"
           onChange={files => {
-            for(let i = 0;i < files.length;i++){
+            for (let i = 0; i < files.length; i++) {
               this.fileReader = new FileReader();
-              this.fileReader.readAsText(files[i]);
               this.fileReader.onload = event => {
                 let json = JSON.parse(event.target.result);
-               /* grupo[files[i].name] = json;
-                opcoesObj['"'+files[i].name+'"'] = {
-                  data: json
-                };*/
+                /* grupo[files[i].name] = json;
+                 opcoesObj['"'+files[i].name+'"'] = {
+                   data: json
+                 };*/
                 let nomeArquivo = files[i].name.replace(".json", "");
                 banana.push({ value: nomeArquivo, name: json });
-                //limao.push({ value: i, name: nomeArquivo });
-                 
+                //limao.push({ value: i, name: nomeArquivo });       
+              };
+              this.fileReader.onloadend = () => {
                 this.setState({
                   dataAtual: banana[0].name,
                   nomesJSON: banana,
-                },() => {
+                }, () => {
+                  this.setState({
+                    seguidores: this.state.dataAtual[0].shortcode_media.informacoes[0].seguidores,
+                    publicacoes: this.state.dataAtual[0].shortcode_media.informacoes[0].numeroPosts,
+                  }, () =>{
+                    this.state.dataAtual.map(data => { data.shortcode_media.taxaEngajamento = (data.shortcode_media.edge_media_preview_like.count + data.shortcode_media.edge_media_preview_comment.count) / this.state.seguidores * 100; return data; });
+                  })
                   
-                  console.log('nomesJSON',this.state.nomesJSON);
-
-                    /*var msg = '#yeah alter #wow #cool dadadda';
-                    const result = this.state.dataAtual.concat(
-                      msg
-                        .match(/(?<=#)\w+/g)
-                        .map(shortcode_media => ({ shortcode_media, value: shortcode_media }))
-                    );
-                    console.log(result);*/
-                    this.state.dataAtual.map(data => {data.shortcode_media.taxaEngajamento = (data.shortcode_media.edge_media_preview_like.count + data.shortcode_media.edge_media_preview_comment.count)/this.state.publicacoes * 100; return data;});
-                    
-                  })              
-              };
+                
+                  console.log(this.state.dataAtual);
+                })
+              }
+              this.fileReader.readAsText(files[i]);
             }
-            
           }}
           onError={err => console.log(err)}
           accepts={[".json"]}
@@ -206,26 +205,26 @@ class App extends Component {
                 <table id="tabelaPosts" className="mb-0 table table-striped">
                   <thead>
                     <tr>
-                      <th onClick={() => this.ordenarColuna("shortcode_media.id")}># <FaSort/></th>
-                      <th onClick={() => this.ordenarColuna("shortcode_media.edge_media_to_caption.edges[0].node.text")}>Publicações<span> ({this.state.dataAtual.length} encontradas)</span> <FaSort/></th>
+                      <th onClick={() => this.ordenarColuna("shortcode_media.id")}># <FaSort /></th>
+                      <th onClick={() => this.ordenarColuna("shortcode_media.taken_at_timestamp")}>Publicações<span> ({this.state.dataAtual.length} encontradas)</span> <FaSort /></th>
                       <th>Thumb</th>
-                      <th onClick={() => this.ordenarColuna("shortcode_media.taxaEngajamento")}>Eng. % <FaSort/></th>
-                      <th onClick={() => this.ordenarColuna("shortcode_media.edge_media_preview_like.count")}>Likes <FaSort/></th>
-                      <th onClick={() => this.ordenarColuna("shortcode_media.edge_media_preview_comment.count")}>Comentários <FaSort/></th>
+                      <th onClick={() => this.ordenarColuna("shortcode_media.taxaEngajamento")}>Eng. % <FaSort /></th>
+                      <th onClick={() => this.ordenarColuna("shortcode_media.edge_media_preview_like.count")}>Likes <FaSort /></th>
+                      <th onClick={() => this.ordenarColuna("shortcode_media.edge_media_preview_comment.count")}>Comentários <FaSort /></th>
                     </tr>
                   </thead>
                   <tbody>
-                  {publicacoes}
-                 
+                    {publicacoes}
+
                   </tbody>
                 </table>
-                                        
+
                 <nav className="" aria-label="Page navigation example">
-                                            <ul id="page-numbers" className="pagination">
-                                            {renderPageNumbers}
-                                            </ul>
-                                        </nav>
-               
+                  <ul id="page-numbers" className="pagination">
+                    {renderPageNumbers}
+                  </ul>
+                </nav>
+
               </div>
             </div>
           </div>
