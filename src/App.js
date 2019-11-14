@@ -13,6 +13,13 @@ import { Line } from 'react-chartjs-2';
 let banana = [];
 let limao = [];
 let publicacoesMes = [];
+let seguidoresMes = [];
+let seguindoMes = [];
+let labels = [];
+let obj = [];
+let obj2 = [];
+let obj3 = [];
+let obj4 = [];
 
 class App extends Component {
   constructor(props) {
@@ -47,7 +54,28 @@ class App extends Component {
         publicacoes: this.state.dataAtual[0].shortcode_media.informacoes[0].numeroPosts,
         seguindo: this.state.dataAtual[0].shortcode_media.informacoes[0].seguindo,
       }, () => {
-        this.state.dataAtual.map(data => { data.shortcode_media.taxaEngajamento = (data.shortcode_media.edge_media_preview_like.count + data.shortcode_media.edge_media_preview_comment.count) / this.state.seguidores * 100; return data; });
+        publicacoesMes = [];
+        labels = [];
+        seguidoresMes = [];
+        seguindoMes = [];
+        for (var i = 0, l = this.state.dataAtual[0].shortcode_media.informacoes[0].informacoesData.length; i < l; i++) {
+       
+          obj = this.state.dataAtual[0].shortcode_media.informacoes[0].informacoesData[i].mediaDiario;
+          obj2 = this.state.dataAtual[0].shortcode_media.informacoes[0].informacoesData[i].data;
+          obj3 = this.state.dataAtual[0].shortcode_media.informacoes[0].informacoesData[i].seguidoresDiario;
+          obj4 = this.state.dataAtual[0].shortcode_media.informacoes[0].informacoesData[i].seguindoDiario;
+          publicacoesMes.push(obj);
+          labels.push(obj2);
+          seguidoresMes.push(obj3);
+          seguindoMes.push(obj4);
+        }
+        this.setState({
+          publicacoesMes: publicacoesMes,
+          seguidoresMes: seguidoresMes,
+          seguindoMes: seguindoMes,
+          labels: labels
+        })
+        this.state.dataAtual.map(data => { data.shortcode_media.taxaEngajamento = (data.shortcode_media.edge_media_preview_like.count + data.shortcode_media.edge_media_preview_comment.count) / this.state.seguidores * 100;  return data; });
       })
     })
   }
@@ -213,19 +241,29 @@ class App extends Component {
                     seguidores: this.state.dataAtual[0].shortcode_media.informacoes[0].seguidores,
                     publicacoes: this.state.dataAtual[0].shortcode_media.informacoes[0].numeroPosts,
                     seguindo: this.state.dataAtual[0].shortcode_media.informacoes[0].seguindo,
-                    
-                    //publicacoesMes:  this.state.dataAtual[0].map(data => { data.shortcode_media.taxaEngajamento = (data.shortcode_media.edge_media_preview_like.count + data.shortcode_media.edge_media_preview_comment.count) / this.state.seguidores * 100; return data; })
                   }, () => {
-                    for (var i = 0, l = this.state.dataAtual[0].shortcode_media.informacoes[0].informacoesData.length; i < l; i++) {
-                      var obj = this.state.dataAtual[0].shortcode_media.informacoes[0].informacoesData[i].seguidoresDiario;
+                    console.log(publicacoesMes);
+                    publicacoesMes = [];
+                    labels = [];
+                    seguidoresMes = [];
+                    seguindoMes = [];
+                    for (var j = 0, l = this.state.dataAtual[0].shortcode_media.informacoes[0].informacoesData.length; j < l; j++) {
+                      obj = this.state.dataAtual[0].shortcode_media.informacoes[0].informacoesData[j].mediaDiario;
+                      obj2 = this.state.dataAtual[0].shortcode_media.informacoes[0].informacoesData[j].data;
+                      obj3 = this.state.dataAtual[0].shortcode_media.informacoes[0].informacoesData[j].seguidoresDiario;
+                      obj4 = this.state.dataAtual[0].shortcode_media.informacoes[0].informacoesData[j].seguindoDiario;
                       publicacoesMes.push(obj);
-                      console.log(publicacoesMes);
+                      labels.push(obj2);
+                      seguidoresMes.push(obj3);
+                      seguindoMes.push(obj4);
                     }
+                    console.log(publicacoesMes);
                     this.setState({
-                      publicacoesMes: publicacoesMes
+                      publicacoesMes: publicacoesMes,
+                      seguidoresMes: seguidoresMes,
+                      seguindoMes: seguindoMes,
+                      labels: labels
                     })
-                    console.log(this.state.dataAtual)
-
                     this.state.dataAtual.map(data => { data.shortcode_media.taxaEngajamento = (data.shortcode_media.edge_media_preview_like.count + data.shortcode_media.edge_media_preview_comment.count) / this.state.seguidores * 100;  return data; });
                   })
                 })
@@ -241,48 +279,63 @@ class App extends Component {
           Drop files here or click to upload
         </Files>
         <div className="row">
-          <div className="col-md-4">
+          <div className="col-md-12">
             <div className="main-card mb-3 card">
               <div className="card-body">
                 <h5 className="card-title">Publicações</h5>
+                <div style={{width: "100%", height:"200px"}}>
                 <Line
                   data={chartPublicacoes}
                   options={{
                     legend: {
                       display: false
                     },
+                    responsive:true,
+                    maintainAspectRatio: false
                   }}
+                  redraw
                 />
+                </div>
               </div>
             </div>
           </div>
-          <div className="col-md-4">
+          <div className="col-md-12">
             <div className="main-card mb-3 card">
               <div className="card-body">
                 <h5 className="card-title">Seguidores</h5>
+                <div style={{width: "100%", height:"200px"}}>
                 <Line
                   data={chartSeguidores}
                   options={{
                     legend: {
                       display: false
                     },
+                    responsive:true,
+                    maintainAspectRatio: false
                   }}
+                  redraw
                 />
+                </div>
               </div>
             </div>
           </div>
-          <div className="col-md-4">
+          <div className="col-md-12">
             <div className="main-card mb-3 card">
               <div className="card-body">
                 <h5 className="card-title">Seguindo</h5>
+                <div style={{width: "100%", height:"200px"}}>
                 <Line
                   data={chartSeguindo}
                   options={{
                     legend: {
                       display: false
                     },
+                    responsive:true,
+                    maintainAspectRatio: false
                   }}
+                  redraw
                 />
+                </div>
               </div>
             </div>
           </div>
