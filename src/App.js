@@ -8,13 +8,12 @@ import Files from "react-files";
 import { orderBy } from "lodash";
 import { FaSort } from 'react-icons/fa';
 import Select from 'react-select';
+import { Line } from 'react-chartjs-2';
 
 let banana = [];
 let limao = [];
-/*[
-    { value: 'USA', name: 'USA' },
-    { value: 'CANADA', name: 'CANADA' }            
-];*/
+let publicacoesMes = [];
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -28,6 +27,10 @@ class App extends Component {
       currentPage: 1,
       todosPerPage: 35,
       selectedOptions: null,
+      labels: [],
+      publicacoesMes: [],
+      seguidoressMes: [],
+      seguindoMes: [],
     };
   }
 
@@ -37,7 +40,15 @@ class App extends Component {
     var option = optionElement.getAttribute('id');
     //banana[0].name,
     this.setState({
-      dataAtual: banana[option].name
+      dataAtual: banana[option].name,
+    }, () => {
+      this.setState({
+        seguidores: this.state.dataAtual[0].shortcode_media.informacoes[0].seguidores,
+        publicacoes: this.state.dataAtual[0].shortcode_media.informacoes[0].numeroPosts,
+        seguindo: this.state.dataAtual[0].shortcode_media.informacoes[0].seguindo,
+      }, () => {
+        this.state.dataAtual.map(data => { data.shortcode_media.taxaEngajamento = (data.shortcode_media.edge_media_preview_like.count + data.shortcode_media.edge_media_preview_comment.count) / this.state.seguidores * 100; return data; });
+      })
     })
   }
 
@@ -128,11 +139,56 @@ class App extends Component {
       return <option key={key} id={key} value={e.value}>{e.value}</option>;
     })
 
+    const chartPublicacoes = {
+      labels: this.state.labels,
+      datasets: [
+        {
+          label: '',
+          fill: false,
+          borderColor: 'rgba(58,196,125,1)',
+          borderWidth: 2,
+          data: this.state.publicacoesMes
+        }
+      ]
+    }
+
+    const chartSeguidores = {
+      labels: this.state.labels,
+      datasets: [
+        {
+          label: '',
+          fill: false,
+          borderColor: 'rgb(63, 106, 216)',
+          borderWidth: 2,
+          data: this.state.seguidoresMes
+        }
+      ]
+    }
+
+    const chartSeguindo = {
+      labels: this.state.labels,
+      datasets: [
+        {
+          label: '',
+          fill: false,
+          borderColor: 'rgb(217, 37, 80)',
+          borderWidth: 2,
+          data: this.state.seguindoMes
+        }
+      ]
+    }
+
+
     return (
       <div className="container-fluid">
+
         <select className="mb-2 mt-2 form-control-lg form-control" onChange={this.handleChange.bind(this)}>
           {opcoesSelect}
         </select>
+
+
+
+
         <Files
           className="files-dropzone"
           onChange={files => {
@@ -156,12 +212,22 @@ class App extends Component {
                   this.setState({
                     seguidores: this.state.dataAtual[0].shortcode_media.informacoes[0].seguidores,
                     publicacoes: this.state.dataAtual[0].shortcode_media.informacoes[0].numeroPosts,
-                  }, () =>{
-                    this.state.dataAtual.map(data => { data.shortcode_media.taxaEngajamento = (data.shortcode_media.edge_media_preview_like.count + data.shortcode_media.edge_media_preview_comment.count) / this.state.seguidores * 100; return data; });
+                    seguindo: this.state.dataAtual[0].shortcode_media.informacoes[0].seguindo,
+                    
+                    //publicacoesMes:  this.state.dataAtual[0].map(data => { data.shortcode_media.taxaEngajamento = (data.shortcode_media.edge_media_preview_like.count + data.shortcode_media.edge_media_preview_comment.count) / this.state.seguidores * 100; return data; })
+                  }, () => {
+                    for (var i = 0, l = this.state.dataAtual[0].shortcode_media.informacoes[0].informacoesData.length; i < l; i++) {
+                      var obj = this.state.dataAtual[0].shortcode_media.informacoes[0].informacoesData[i].seguidoresDiario;
+                      publicacoesMes.push(obj);
+                      console.log(publicacoesMes);
+                    }
+                    this.setState({
+                      publicacoesMes: publicacoesMes
+                    })
+                    console.log(this.state.dataAtual)
+
+                    this.state.dataAtual.map(data => { data.shortcode_media.taxaEngajamento = (data.shortcode_media.edge_media_preview_like.count + data.shortcode_media.edge_media_preview_comment.count) / this.state.seguidores * 100;  return data; });
                   })
-                  
-                
-                  console.log(this.state.dataAtual);
                 })
               }
               this.fileReader.readAsText(files[i]);
@@ -175,6 +241,53 @@ class App extends Component {
           Drop files here or click to upload
         </Files>
         <div className="row">
+          <div className="col-md-4">
+            <div className="main-card mb-3 card">
+              <div className="card-body">
+                <h5 className="card-title">Publicações</h5>
+                <Line
+                  data={chartPublicacoes}
+                  options={{
+                    legend: {
+                      display: false
+                    },
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div className="main-card mb-3 card">
+              <div className="card-body">
+                <h5 className="card-title">Seguidores</h5>
+                <Line
+                  data={chartSeguidores}
+                  options={{
+                    legend: {
+                      display: false
+                    },
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div className="main-card mb-3 card">
+              <div className="card-body">
+                <h5 className="card-title">Seguindo</h5>
+                <Line
+                  data={chartSeguindo}
+                  options={{
+                    legend: {
+                      display: false
+                    },
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+
           <div className="col-md-4">
             <ComponentWrapper
               publicacoes={this.state.publicacoes}
