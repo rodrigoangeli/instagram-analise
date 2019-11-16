@@ -9,7 +9,6 @@ async function scrapeInfiniteScrollItems(
   const informacoes = {};
   const informacoesData = [];
   try {
-
     let nome = await page.$eval('#YouTubeUserTopInfoBlockTop > div:nth-child(1) > h2 > a', nomeInsta => nomeInsta.innerText)
     nome = nome.replace('@','');
     let seguidores = await page.$eval('#YouTubeUserTopInfoBlock > div:nth-child(3) > span:nth-child(3)', followers => followers.innerText);
@@ -24,9 +23,9 @@ async function scrapeInfiniteScrollItems(
     let dataAntiga = await page.$eval("#socialblade-user-content > div:nth-child(5) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1)", dataAntiga => dataAntiga.innerText);
     let dataRecente = await page.$eval('#socialblade-user-content > div:nth-child(5) > div:nth-child(30) > div:nth-child(1) > div:nth-child(1)', dataRecente => dataRecente.innerText);
     dataAntiga = dataAntiga + 'T12:00:00Z';
-    dataAntiga = new Date(dataAntiga).toDateString();
+    dataAntiga = new Date(dataAntiga).toLocaleDateString('pt-BR');
     dataRecente = dataRecente + 'T12:00:00Z';
-    dataRecente = new Date(dataRecente).toDateString();
+    dataRecente = new Date(dataRecente).toLocaleDateString('pt-BR');
     informacoes["nome"] = nome;
     informacoes["seguidores"] = seguidores;
     informacoes["seguindo"] = seguindo;
@@ -37,12 +36,11 @@ async function scrapeInfiniteScrollItems(
     await page.waitForSelector('#socialblade-user-content');   
     let totalTabelaRow = await page.$$('#socialblade-user-content > div:nth-child(5) > div')
     let totalTabelaRowLen = await totalTabelaRow.length;
-    console.log(totalTabelaRowLen)
   for (var i = 1;i <= totalTabelaRowLen - 1;i++) {
         let items = {};
         let tabelaData = await page.$eval('#socialblade-user-content > div:nth-child(5) > div:nth-child('+i+') > div:nth-child(1) > div:nth-child(1)', tabelaData => tabelaData.innerText);
         tabelaData = tabelaData + 'T12:00:00Z';
-        tabelaData = new Date(tabelaData).toDateString();
+        tabelaData = new Date(tabelaData).toLocaleDateString('pt-BR');
         let seguidoresDiario = await page.$eval('#socialblade-user-content > div:nth-child(5) > div:nth-child('+i+') > div:nth-child(2) > div:nth-child(1)', seguidoresDiario => seguidoresDiario.innerText);
         let seguidoresInt = isNaN(parseInt(seguidoresDiario)) ? 0 : parseInt(seguidoresDiario);
         let seguindoDiario = await page.$eval('#socialblade-user-content > div:nth-child(5) > div:nth-child('+i+') > div:nth-child(3) > div:nth-child(1)', seguindoDiario => seguindoDiario.innerText);
@@ -74,7 +72,7 @@ async function scrapeInfiniteScrollItems(
   const page = await browser.newPage(); 
 
   // Navigate to the demo page.
-  let marcas = ['cers','verbojuridico'];
+  let marcas = ['cers','verbojuridico','ceisc_','verbo_oab','cursoenfase','cursodamasio','supremotv'];
   
   for(var e = marcas.length - 1; e >= 0; e--){
     await page.goto('https://socialblade.com/instagram/user/'+marcas[e]+'/monthly'); 
@@ -83,10 +81,8 @@ async function scrapeInfiniteScrollItems(
     let data = JSON.stringify(post, null, 2);
     console.log(marcas[e])
     // Save extracted items to a file.
-    fs.writeFileSync('json/'+marcas[e] + '_sb.json', data, 'utf8');
+    fs.writeFileSync(marcas[e] + '_sb.json', data, 'utf8');
   }
-
-
   await browser.close();
 
 

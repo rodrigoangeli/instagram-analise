@@ -7,7 +7,6 @@ const ComponentWrapper = (props) => {
     return (
         <>
 
-            <td>{props.id}</td>
             <td>
                 <div className="badge badge-pill badge-secondary">{props.tipo}</div> <span className="badge badge-light">Postado em {props.dia} ({props.horario})</span> <a rel="noopener noreferrer" target="_blank" href={props.link}><FiExternalLink /></a>
                 <br />{props.descricao}</td>
