@@ -1,45 +1,95 @@
-import React, {Component} from 'react';
+import React, {Component}  from 'react';
 import { Line } from 'react-chartjs-2';
 
-const data = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-  datasets: [
-    {
-      label: 'My First dataset',
-      fill: false,
-      lineTension: 0.1,
-      backgroundColor: 'rgba(75,192,192,0.4)',
-      borderColor: 'rgba(75,192,192,1)',
-      borderCapStyle: 'butt',
-      borderDash: [],
-      borderDashOffset: 0.0,
-      borderJoinStyle: 'miter',
-      pointBorderColor: 'rgba(75,192,192,1)',
-      pointBackgroundColor: '#fff',
-      pointBorderWidth: 1,
-      pointHoverRadius: 5,
-      pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-      pointHoverBorderColor: 'rgba(220,220,220,1)',
-      pointHoverBorderWidth: 2,
-      pointRadius: 1,
-      pointHitRadius: 10,
-      data: [65, 59, 80, 81, 56, 55, 40]
+let options = {
+  legend: {
+    display: false
+  },
+  responsive: true,
+  maintainAspectRatio: false,
+  layout: {
+    padding: {
+      left: 0,
+      right: 10,
+      top: 10,
+      bottom: 10
     }
-  ]
-};
+  },
+  scales: {
+    xAxes: [{
+      display: false,
+    }],
+    yAxes: [{
+      display: true
+    }]
+  },
+}
+export default class GraficoLine extends Component {
+  
+	constructor(props) {
+		super(props);
+		this.state = {
+      nometag: options,
+		};
+  }
 
-export default class LineDemo extends Component {
-  render() {
-    return (
-      <div>
-        <h2>Line Example</h2>
-        <Line ref="chart" data={data} />
+  cliqueExpandir(aqui) {
+    this.setState({
+      nometag: {
+        legend: {
+          display: false
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+          padding: {
+            left: 0,
+            right: 10,
+            top: 10,
+            bottom: 10
+          }
+        },
+        scales: {
+          xAxes: [{
+            display: true,
+          }],
+          yAxes: [{
+            display: true
+          }]
+        }},
+      active: 1
+    });
+  }
+
+	render() {
+		return (
+      <div className={this.state.active === 1 ? 'col-md-12 active' : 'col-md-4'}>
+        <div className="main-card mb-3 card">
+          <div className="card-body">
+            <h5 className="card-title">{this.props.nome}
+            <span onClick={() => this.cliqueExpandir(this.props.nometag)}>Expandir</span></h5>
+            <div className="canvas-wrapper">
+              {this.props.nometag && <Line
+                data={{
+                  labels: this.props.labels,
+                  datasets: [
+                    {
+                      fill: false,
+                      pointHitRadius: 5,
+                      borderColor: this.props.cor,
+                      pointBackgroundColor: this.props.cor,
+                      borderWidth: 2,
+                      data: this.props.dados
+                    }
+                  ]
+                }}
+                options={this.state.nometag}
+                redraw
+              />}
+            </div>
+          </div>
+        </div>
       </div>
-    );
-  }
-
-  componentDidMount() {
-    const { datasets } = this.refs.chart.chartInstance.data
-    console.log(datasets[0].data);
-  }
+		);
+	}
 }

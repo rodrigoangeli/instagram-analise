@@ -11,7 +11,7 @@
 # production
 /build
 
-/rodar
+/rodar/*.json
 
 # misc
 .DS_Store
