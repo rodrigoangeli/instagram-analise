@@ -36,6 +36,10 @@ class App extends Component {
       seguindoMes: [],
       hashtagArr: [],
       activeItem: -1,
+      diaInicial: null,
+      diaFinal:null,
+      diaInput:null,
+      tempoArray: [],
     };
   }
 
@@ -91,6 +95,8 @@ class App extends Component {
   }
 
 
+
+
   render() {
 
 
@@ -104,7 +110,10 @@ class App extends Component {
         <ul id="select" className="nav ">
           {opcoesSelect}
         </ul>
-        <Calendario/>
+        <Calendario
+        dataInicial={this.state.dataInicial}
+        dataFinal={this.state.dataFinal}
+        />
         </nav>
       <div className="container-fluid">
       

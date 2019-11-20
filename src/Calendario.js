@@ -1,38 +1,48 @@
 import React, { Component } from 'react';
-import Calendar from 'react-calendar/dist/entry.nostyle';
+import momentPropTypes from 'react-moment-proptypes';
+import moment from 'moment';
+import 'react-dates/initialize';
+import { DateRangePicker } from 'react-dates';
+import 'react-dates/lib/css/_datepicker.css';
+moment.locale('pt-br');
 
 export default class Calendario extends Component {
 
-  constructor(props) {
-		super(props);
-		this.state = {
-      date: new Date(),
-      maxDate: new Date(),
-      minDate: new Date('11-11-2019'),
-      isVisible: false
+  constructor (props){
+    super(props)
+    this.state={
+      startDate: "",
+      endDate: "",
+      focusedInput: "",
     };
-    this.onClick = this.onClick.bind(this);
   }
-  
-  onClick = (e) => this.setState({isVisible: !this.state.isVisible});
-  onChange = date => this.setState({ date })
 
   render() {
-
+    const endDateString = this.state.endDate && this.state.endDate.format('DD-MM-YYYY');
+    const startDateString = this.state.startDate && this.state.startDate.format('DD-MM-YYYY');
+    const startDateArr = startDateString.split("-");
+    const endDateArr = endDateString.split("-");
+    const a = moment(startDateArr);
+    const b = moment(endDateArr);
+    
+    
     return (
       <div>
-        <div className="mr-2 btn btn-primary selecionarData" onClick={this.onClick}>{this.state.isVisible ? 'fechar':'Selecionar data'}</div>
-        <div className="show fade">
-        {this.state.isVisible && <Calendar
-          onChange={this.onChange}
-          value={this.state.date}
-          selectRange={true}
-          maxDate={this.state.maxDate}
-          minDate={this.state.minDate}
-          showNeighboringMonth={false}
-        />}
-        </div>
-      </div>
+      <DateRangePicker
+                       startDate={this.state.startDate} // momentPropTypes.momentObj or null,
+                       endDate={this.state.endDate} // momentPropTypes.momentObj or null,
+                       onDatesChange={({ startDate, endDate }) => this.setState({ startDate, endDate })} // PropTypes.func.isRequired,
+                       focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
+                       onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
+                       endDatePlaceholderText={"Data final"}
+                       startDatePlaceholderText={"Data inicial"}
+                       displayFormat={"DD/MM/YYYY"}
+                       numberOfMonths={1}
+                     />
+                   {startDateString}
+                   <br/>
+                   {endDateString}
+  </div>
     );
   }
 }

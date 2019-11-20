@@ -71,8 +71,30 @@
 position: sticky;
 top: 0;
 background-color: white;
-padding: 0 20px;
+padding: 0 60px;
+justify-content: space-between;
 z-index: 100;
+height: auto;
+min-height: 3.5rem;
+
+.form-inline{
+  min-width: 450px;
+  position: relative;
+label{
+  position: relative;
+  svg{
+        position: absolute;
+    left: 12px;
+
+  }
+  input{
+    padding-left: 36px;
+  }
+}
+& > svg{
+   margin:0 8px;
+ }
+}
 
 .selecionarData{
   width:150px;
@@ -98,7 +120,8 @@ z-index: 100;
 
   .react-calendar{
     position: absolute;
-      right: 0;
+      left: 0;
+      top:calc(2.25rem + 2px);
       max-width: 343px;
       margin-right: 25px;
       z-index: 100;
@@ -216,7 +239,6 @@ z-index: 100;
   & > .nav {
     margin-left: -($card-spacer-x / 2);
     height: 100%;
-    width: 100%;
 
     .nav-item {
       position: relative;
