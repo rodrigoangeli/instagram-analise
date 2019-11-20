@@ -1,11 +1,11 @@
 @echo off
 del "teste.txt" >nul 2>&1
 setlocal enabledelayedexpansion
-echo [96mQuantos posts devem ser rastreados?[0m
+echo Quantos posts devem ser rastreados?
 set /p numero=
 echo .
-echo [96mEscreva separado por linha cada instagram[0m([93m[4msem @[0m) [96mque você deseja analisar[0m
-echo [93mQuando terminar pressione enter sem digitar nenhuma letra.[0m^
+echo Escreva separado por linha cada instagram(sem @) que você deseja analisar
+echo Quando terminar pressione enter sem digitar nenhuma letra.^
 
 
 

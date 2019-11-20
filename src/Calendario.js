@@ -11,19 +11,15 @@ export default class Calendario extends Component {
   constructor (props){
     super(props)
     this.state={
-      startDate: "",
-      endDate: "",
-      focusedInput: "",
+      startDate: null,
+      endDate: null,
+      focusedInput: null,
     };
   }
 
   render() {
     const endDateString = this.state.endDate && this.state.endDate.format('DD-MM-YYYY');
     const startDateString = this.state.startDate && this.state.startDate.format('DD-MM-YYYY');
-    const startDateArr = startDateString.split("-");
-    const endDateArr = endDateString.split("-");
-    const a = moment(startDateArr);
-    const b = moment(endDateArr);
     
     
     return (
@@ -38,6 +34,9 @@ export default class Calendario extends Component {
                        startDatePlaceholderText={"Data inicial"}
                        displayFormat={"DD/MM/YYYY"}
                        numberOfMonths={1}
+                       startDateId={'algo'}
+                       endDateId={'algo2'}
+                       isOutsideRange={() => false}
                      />
                    {startDateString}
                    <br/>

@@ -6,6 +6,11 @@ import Calendario from "./Calendario";
 import HashtagWrapper from "./HashtagWrapper";
 import PostsWrapper from "./PostsWrapper";
 import Files from "react-files";
+import moment from 'moment';
+import 'react-dates/initialize';
+import { DateRangePicker } from 'react-dates';
+import 'react-dates/lib/css/_datepicker.css';
+moment.locale('pt-br');
 
 let banana = [];
 let publicacoesMes = [];
@@ -36,10 +41,9 @@ class App extends Component {
       seguindoMes: [],
       hashtagArr: [],
       activeItem: -1,
-      diaInicial: null,
-      diaFinal:null,
-      diaInput:null,
-      tempoArray: [],
+      startDate: moment("2019-11-10"),
+      endDate:moment("2019-11-15"),
+      focusedInput: null,
     };
   }
 
@@ -78,6 +82,7 @@ class App extends Component {
           labels.push(obj2);
           seguidoresMes.push(obj3);
           seguindoMes.push(obj4);
+          console.log(labels);
         }
         this.setState({
           publicacoesMes: publicacoesMes,
@@ -98,7 +103,8 @@ class App extends Component {
 
 
   render() {
-
+    const endDateString = this.state.endDate && this.state.endDate.format('DD-MM-YYYY');
+    const startDateString = this.state.startDate && this.state.startDate.format('DD-MM-YYYY');
 
     let opcoesSelect = this.state.nomesJSON.map((e, key) => {
       return <li className="nav-item" key={key} id={key}><span onClick={this.handleChange.bind(this, key)} key={key} role="tab" id={key} className={this.state.activeItem === key ? 'nav-link active' : 'nav-link'}><img className='img-fluid' alt={e.value} src={e.name[0].shortcode_media.owner.profile_pic_url}></img>{e.value}</span></li>;
@@ -110,10 +116,20 @@ class App extends Component {
         <ul id="select" className="nav ">
           {opcoesSelect}
         </ul>
-        <Calendario
-        dataInicial={this.state.dataInicial}
-        dataFinal={this.state.dataFinal}
-        />
+        <DateRangePicker
+                       startDate={this.state.startDate} // momentPropTypes.momentObj or null,
+                       endDate={this.state.endDate} // momentPropTypes.momentObj or null,
+                       onDatesChange={({ startDate, endDate }) => this.setState({ startDate, endDate })} // PropTypes.func.isRequired,
+                       focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
+                       onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
+                       endDatePlaceholderText={"Data final"}
+                       startDatePlaceholderText={"Data inicial"}
+                       displayFormat={"DD/MM/YYYY"}
+                       numberOfMonths={1}
+                       startDateId={'algo'}
+                       endDateId={'algo2'}
+                       isOutsideRange={() => false}
+                     />
         </nav>
       <div className="container-fluid">
       

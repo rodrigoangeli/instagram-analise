@@ -45,7 +45,7 @@ export default class PostsWrapper extends Component {
     const indexOfLastTodo = currentPage * todosPerPage;
     const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
     const currentTodos = this.props.dados.slice(indexOfFirstTodo, indexOfLastTodo);
-    console.log(currentTodos);
+    
     const pageNumbers = [];
     for (let i = 1; i <= Math.ceil(this.props.dados.length / todosPerPage); i++) {
       pageNumbers.push(i);

@@ -1,0 +1,7 @@
+user cers --count=100 --full 
+user verbojuridico --count=100 --full 
+user ceisc_ --count=100 --full 
+user verbo_oab --count=100 --full 
+user cursoenfase --count=100 --full 
+user cursodamasio --count=100 --full 
+user supremotv --count=100 --full 
