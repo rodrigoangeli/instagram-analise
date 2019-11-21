@@ -21,12 +21,15 @@ let obj = [];
 let obj2 = [];
 let obj3 = [];
 let obj4 = [];
+let obj5 = [];
+let datas = [];
 
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.setPosts = this.setPosts.bind(this);
+    this.onDatesChange = this.onDatesChange.bind(this);
     this.state = {
       dataAtual: [],
       nomesJSON: [],
@@ -41,9 +44,10 @@ class App extends Component {
       seguindoMes: [],
       hashtagArr: [],
       activeItem: -1,
-      startDate: moment("2019-11-10"),
-      endDate:moment("2019-11-15"),
+      startDate: null,
+      endDate:null,
       focusedInput: null,
+      limitando:[]
     };
   }
 
@@ -63,7 +67,25 @@ class App extends Component {
     for (var k in counts){if (counts.hasOwnProperty(k)) {var hashK = { hashtag:k, repeticoes: counts[k] }; hashtagComb.push(hashK) } } 
     hashtagComb.sort((a,b) => (a.repeticoes > b.repeticoes) ? -1 : ((b.repeticoes > a.repeticoes) ? 1 : 0)); 
 
+    for (var x = 0, c = this.state.dataAtual.length; x < c; x++) {
+      
+      obj5 = this.state.dataAtual[x].shortcode_media.taken_at_timestamp;
+      obj5 = obj5 * 1000
+      datas.push(obj5);
+    }
+    datas.sort((a,b) => (a > b) ? -1 : ((b > a) ? 1 : 0)); 
+    datas = datas.map(algo3 => { return moment(algo3).format('YYYY-MM-DD') });
+    
+   
+    const filteredDates = this.state.dataAtual.filter(d => { return (new Date(moment(d.shortcode_media.taken_at_timestamp * 1000).format('YYYY-MM-DD')) - new Date(this.state.endDate) > 0)})
+    //const filteredDates = this.state.dataAtual.filter(d => new Date(moment(d.shortcode_media.taken_at_timestamp * 1000).format('YYYY-MM-DD')) - new Date("2019-11-18") > 0)
+
+
     this.setState({
+      dataAtual:filteredDates,
+      startDate: moment(datas[datas.length - 1]),
+      endDate:moment(datas[0]),
+      limitando: [moment(datas[datas.length - 1]), moment(datas[0])],
       hashtagArr: hashtagComb,
         seguidores: informacoesMarca.seguidores,
         publicacoes: informacoesMarca.numeroPosts,
@@ -73,7 +95,9 @@ class App extends Component {
         labels = [];
         seguidoresMes = [];
         seguindoMes = [];
+        datas = [];
         for (var i = 0, l = informacoesMarca.informacoesData.length; i < l; i++) {
+          
           obj = informacoesMarca.informacoesData[i].mediaDiario;
           obj2 = informacoesMarca.informacoesData[i].data;
           obj3 = informacoesMarca.informacoesData[i].seguidoresDiario;
@@ -82,7 +106,6 @@ class App extends Component {
           labels.push(obj2);
           seguidoresMes.push(obj3);
           seguindoMes.push(obj4);
-          console.log(labels);
         }
         this.setState({
           publicacoesMes: publicacoesMes,
@@ -99,7 +122,17 @@ class App extends Component {
     this.setState({dataAtual: posts});
   }
 
+  isOutsideRange = day =>
+  day.isAfter(moment(this.state.limitando[1])) || day.isBefore(moment(this.state.limitando[0]));
 
+  onDatesChange({ startDate, endDate }) {
+    let filteredDates = this.state.dataAtual.filter(d => { return (new Date(moment(d.shortcode_media.taken_at_timestamp * 1000).format('YYYY-MM-DD')) - new Date(this.state.startDate) > 0)})
+    this.setState({
+      dataAtual: filteredDates,
+      startDate: startDate,
+      endDate: endDate,
+    });
+  }
 
 
   render() {
@@ -119,16 +152,19 @@ class App extends Component {
         <DateRangePicker
                        startDate={this.state.startDate} // momentPropTypes.momentObj or null,
                        endDate={this.state.endDate} // momentPropTypes.momentObj or null,
-                       onDatesChange={({ startDate, endDate }) => this.setState({ startDate, endDate })} // PropTypes.func.isRequired,
+                       onDatesChange={this.onDatesChange} // PropTypes.func.isRequired,
                        focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
                        onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
-                       endDatePlaceholderText={"Data final"}
-                       startDatePlaceholderText={"Data inicial"}
+                       endDatePlaceholderText={"Data Final"}
+                       startDatePlaceholderText={"Data Inicial"}
                        displayFormat={"DD/MM/YYYY"}
                        numberOfMonths={1}
                        startDateId={'algo'}
                        endDateId={'algo2'}
-                       isOutsideRange={() => false}
+                       isOutsideRange={this.isOutsideRange}
+                       hideKeyboardShortcutsPanel={true}
+                       showDefaultInputIcon={true}
+                       
                      />
         </nav>
       <div className="container-fluid">
@@ -147,7 +183,9 @@ class App extends Component {
                 banana.push({ value: nomeArquivo, name: json });   
                 this.setState({
                   nomesJSON: banana,
-                },()=>{console.log(this.state.nomesJSON)})  
+                },()=>{
+                  //console.log(this.state.nomesJSON)
+                })  
               };
               this.fileReader.readAsText(files[i]);
             }

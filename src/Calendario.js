@@ -25,6 +25,7 @@ export default class Calendario extends Component {
     return (
       <div>
       <DateRangePicker
+                       date={this.state.startDate} // momentPropTypes.momentObj or null,
                        startDate={this.state.startDate} // momentPropTypes.momentObj or null,
                        endDate={this.state.endDate} // momentPropTypes.momentObj or null,
                        onDatesChange={({ startDate, endDate }) => this.setState({ startDate, endDate })} // PropTypes.func.isRequired,
