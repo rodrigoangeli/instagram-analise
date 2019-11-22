@@ -2,12 +2,10 @@
 import React, { Component } from "react";
 import ComponentWrapper from "./ComponentWrapper";
 import GraficoLine from "./GraficoLine";
-import Calendario from "./Calendario";
 import HashtagWrapper from "./HashtagWrapper";
 import PostsWrapper from "./PostsWrapper";
 import Files from "react-files";
 import moment from "moment";
-import Modal from "./Componente";
 import "react-dates/initialize";
 import { DateRangePicker } from "react-dates";
 import "react-dates/lib/css/_datepicker.css";
@@ -49,14 +47,9 @@ class App extends Component {
       endDate: null,
       focusedInput: null,
       limitando: [],
-      show: false
     };
   }
-  showModal = e => {
-    this.setState({
-      show: !this.state.show
-    });
-  };
+ 
   
   handleChange(key, e) {
     let hashtagComb = [];
@@ -313,23 +306,7 @@ class App extends Component {
             />
           </div>
         </div>
-        <button
-          class="toggle-button"
-          id="centered-toggle-button"
-          onClick={e => {
-            this.showModal(e);
-          }}
-        >
-          {" "}
-          show Modal{" "}
-        </button>
-
-        <Modal onClose={this.showModal} show={this.state.show}>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nobis
-          deserunt corrupti, ut fugit magni qui quasi nisi amet repellendus non
-          fuga omnis a sed impedit explicabo accusantium nihil doloremque
-          consequuntur.
-        </Modal>
+    
       </div>
     );
   }

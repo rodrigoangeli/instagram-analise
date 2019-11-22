@@ -75,8 +75,19 @@
 // Default zebra-stripe styles (alternating gray and transparent backgrounds)
 
 .table-striped {
+  tbody tr{
+    &:hover{
+      background-color: #ebe6ff;
+      cursor: pointer;
+    }
+  }
+
   tbody tr:nth-of-type(#{$table-striped-order}) {
     background-color: $table-accent-bg;
+    &:hover{
+      background-color: #ebe6ff;
+      cursor: pointer;
+    }
   }
   tbody td{
     text-align: center;

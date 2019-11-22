@@ -67,11 +67,13 @@ export default class PostsWrapper extends Component {
 
     let publicacoes = currentTodos.map((data, index) => (
       
-      <tr key={index}>
+     
         <PostsList
+
           link={'https://www.instagram.com/p/' + data.shortcode_media.shortcode}
           tipo={data.shortcode_media.__typename === "GraphImage" ? 'Foto' : data.shortcode_media.__typename === "GraphVideo" ? 'Video' : 'Carrossel'}
           descricao={(data.shortcode_media.edge_media_to_caption.edges[0].node.text).substring(0, 50) + '..'}
+          
           horario={new Date(
             data.shortcode_media.taken_at_timestamp * 1000
           ).toLocaleTimeString()}
@@ -82,8 +84,10 @@ export default class PostsWrapper extends Component {
           taxaEngajamento={((data.shortcode_media.edge_media_preview_like.count + data.shortcode_media.edge_media_preview_comment.count) / this.props.seguidores * 100).toFixed(2) + '%'}
           likesPost={data.shortcode_media.edge_media_preview_like.count}
           comentarios={data.shortcode_media.edge_media_preview_comment.count}
+          descricaoCompleta={data.shortcode_media.edge_media_to_caption.edges[0].node.text}
+          nome={data.shortcode_media.owner.full_name}
+          arroba={data.shortcode_media.owner.username}
         />
-      </tr>
     ))
 		return (
 
