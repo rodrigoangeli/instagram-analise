@@ -4,11 +4,13 @@ import ComponentWrapper from "./ComponentWrapper";
 import GraficoLine from "./GraficoLine";
 import HashtagWrapper from "./HashtagWrapper";
 import PostsWrapper from "./PostsWrapper";
+import ComparacaoList from "./ComparacaoList";
 import Files from "react-files";
 import moment from "moment";
 import "react-dates/initialize";
 import { DateRangePicker } from "react-dates";
 import "react-dates/lib/css/_datepicker.css";
+
 moment.locale("pt-br");
 
 let banana = [];
@@ -23,7 +25,7 @@ let obj4 = [];
 let obj5 = [];
 let datas = [];
 
-class App extends Component {
+class Main extends Component {
   constructor(props) {
     super(props);
     this.setPosts = this.setPosts.bind(this);
@@ -47,6 +49,7 @@ class App extends Component {
       endDate: null,
       focusedInput: null,
       limitando: [],
+      diferencaString: '',
     };
   }
  
@@ -62,11 +65,17 @@ class App extends Component {
         dataAtualPrev: banana[option].name
       },
       () => {
+
         const informacoesMarca = this.state.dataAtual[0].shortcode_media
           .informacoes[0];
-        const hashtags = this.state.dataAtual.map(algo => {
-          return algo.shortcode_media.edge_media_to_caption.edges[0].node.text;
-        });
+          const hashtags = this.state.dataAtual.map(algo => {
+            if(algo.shortcode_media.edge_media_to_caption.edges.length > 0){
+              return algo.shortcode_media.edge_media_to_caption.edges[0].node.text;
+            } else{
+              return '';
+            }
+          });
+
         const hashtagsStarts = hashtags.map(algo2 => {
           return algo2.split(" ").filter(v => v.startsWith("#"));
         });
@@ -84,11 +93,16 @@ class App extends Component {
           a.repeticoes > b.repeticoes ? -1 : b.repeticoes > a.repeticoes ? 1 : 0
         );
 
-        for (var x = 0, c = this.state.dataAtual.length; x < c; x++) {
-          obj5 = this.state.dataAtual[x].shortcode_media.taken_at_timestamp;
-          obj5 = obj5 * 1000;
-          datas.push(obj5);
+        hashtagComb = hashtagComb.slice(0, 10);
+
+        for (var x = 0, c = this.state.nomesJSON.length; x < c; x++) {
+          for (var x2 = 0, c2 = this.state.nomesJSON[x].name.length; x2 < c2; x2++) {
+            obj5 = this.state.nomesJSON[x].name[x2].shortcode_media.taken_at_timestamp;
+            obj5 = obj5 * 1000;
+            datas.push(obj5);
+          }
         }
+
         datas.sort((a, b) => (a > b ? -1 : b > a ? 1 : 0));
         datas = datas.map(algo3 => {
           return moment(algo3).format("YYYY-MM-DD");
@@ -97,11 +111,36 @@ class App extends Component {
         //const filteredDates = this.state.dataAtual.filter(d => { return (new Date(moment(d.shortcode_media.taken_at_timestamp * 1000).format('YYYY-MM-DD')) - new Date(this.state.endDate) > 0)})
         //const filteredDates = this.state.dataAtual.filter(d => new Date(moment(d.shortcode_media.taken_at_timestamp * 1000).format('YYYY-MM-DD')) - new Date("2019-11-18") > 0)
 
-        this.setState(
-          {
+        if(this.state.startDate === null){
+          this.setState({
             startDate: moment(datas[datas.length - 1]),
             endDate: moment(datas[0]),
-            limitando: [moment(datas[datas.length - 1]), moment(datas[0]).add('days', 1)],
+            limitando: [moment(datas[datas.length - 1]), moment(datas[0]).add(1, 'days')],
+            diferencaString: moment.duration(moment(datas[0]).diff(moment(datas[datas.length - 1]))).asDays(),
+          })
+        } else {
+          let filteredDates = this.state.dataAtual.filter(d => {
+            return (
+              new Date(
+                moment(d.shortcode_media.taken_at_timestamp * 1000).format(
+                  "YYYY-MM-DD"
+                )
+              ) <= new Date(this.state.endDate) &&
+              new Date(
+                moment(d.shortcode_media.taken_at_timestamp * 1000).format(
+                  "YYYY-MM-DD"
+                )
+              ) >= new Date(this.state.startDate)
+            );
+          });
+          this.setState({
+            diferencaString: NaN || '0' ? moment.duration(moment(this.state.endDate).diff(moment(this.state.startDate))).asDays() : '0',
+            dataAtual: filteredDates,
+          })
+        }      
+
+        this.setState(
+          {
             hashtagArr: hashtagComb,
             seguidores: informacoesMarca.seguidores,
             publicacoes: informacoesMarca.numeroPosts,
@@ -177,7 +216,33 @@ class App extends Component {
             ) >= new Date(this.state.startDate)
           );
         });
+
+       /* for(var q = 0;q < this.state.nomesJSON.length;q++){
+
+            for (var q2 = 0, e2 = this.state.nomesJSON[q].name.length; q2 < e2; q2++) {
+              let geralFiltrado = this.state.nomesJSON.filter(d => {
+                return (
+                  new Date(
+                    moment(d.name[q2].shortcode_media.taken_at_timestamp * 1000).format(
+                      "YYYY-MM-DD"
+                    )
+                  ) <= new Date(this.state.endDate) &&
+                  new Date(
+                    moment(d.name[q2].shortcode_media.taken_at_timestamp * 1000).format(
+                      "YYYY-MM-DD"
+                    )
+                  ) >= new Date(this.state.startDate)
+                );
+              });
+              console.log(geralFiltrado)
+            }
+         
+        }*/
+        
+
+
         this.setState({
+          diferencaString: NaN || '0' ? moment.duration(moment(endDate).diff(moment(startDate))).asDays() : '0',
           dataAtual: filteredDates
         });
       }
@@ -185,6 +250,22 @@ class App extends Component {
   }
 
   render() {
+    const endDateString = this.state.endDate && this.state.endDate.format('DD-MM-YYYY');
+    const startDateString = this.state.startDate && this.state.startDate.format('DD-MM-YYYY');
+
+        
+    let comparacoes = this.state.nomesJSON.map((data, index) => (
+      <ComparacaoList
+      key={index}
+      perfil={'@' + data.name[0].shortcode_media.owner.username + ' - ' + data.name[0].shortcode_media.owner.full_name}
+      publicacoes={data.name.length}
+      fotos={''}
+      carrossel={''}
+      video={''}
+      src={data.name[0].shortcode_media.owner.profile_pic_url}
+      />
+  ))
+
 
 
     let opcoesSelect = this.state.nomesJSON.map((e, key) => {
@@ -216,23 +297,7 @@ class App extends Component {
           <ul id="select" className="nav ">
             {opcoesSelect}
           </ul>
-          <DateRangePicker
-            startDate={this.state.startDate} // momentPropTypes.momentObj or null,
-            endDate={this.state.endDate} // momentPropTypes.momentObj or null,
-            onDatesChange={this.onDatesChange} // PropTypes.func.isRequired,
-            focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
-            onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
-            endDatePlaceholderText={"Data Final"}
-            startDatePlaceholderText={"Data Inicial"}
-            displayFormat={"DD/MM/YYYY"}
-            numberOfMonths={1}
-            startDateId={"algo"}
-            endDateId={"algo2"}
-            isOutsideRange={this.isOutsideRange}
-            hideKeyboardShortcutsPanel={true}
-            showDefaultInputIcon={true}
-            minimumNights={0}
-          />
+     
         </nav>
         <div className="container-fluid">
           <Files
@@ -264,6 +329,12 @@ class App extends Component {
             Drop files here or click to upload
           </Files>
           <div className="row">
+            <div className="col-12 mb-3">
+            <div className="h4">Nos últimos 30 dias</div>
+            <div className="text-secondary h6">25/10/2019 a 25/11/2019</div>
+            </div>
+          </div>
+          <div className="row">
             <GraficoLine
               nome="Publicações"
               nometag="publicacoesLine"
@@ -292,11 +363,39 @@ class App extends Component {
               redraw
             />
           </div>
+          
           <ComponentWrapper
-            publicacoes={this.state.publicacoes}
+            publicacoes={this.state.publicacoes}            
             seguidores={this.state.seguidores}
             seguindo={this.state.seguindo}
           />
+          <hr/>
+          <div className="row justify-content-between mb-3">
+            <div className="col-8">        
+          <div className="h4">Dados dos últimos {this.state.diferencaString} dias</div>
+            <div className="text-secondary h6">{startDateString} a {endDateString}</div>
+            </div>
+            <div className="col-4 text-right">
+            <DateRangePicker
+            startDate={this.state.startDate} // momentPropTypes.momentObj or null,
+            endDate={this.state.endDate} // momentPropTypes.momentObj or null,
+            onDatesChange={this.onDatesChange} // PropTypes.func.isRequired,
+            focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
+            onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
+            endDatePlaceholderText={"Data Final"}
+            startDatePlaceholderText={"Data Inicial"}
+            displayFormat={"DD/MM/YYYY"}
+            numberOfMonths={1}
+            startDateId={"algo"}
+            endDateId={"algo2"}
+            isOutsideRange={this.isOutsideRange}
+            hideKeyboardShortcutsPanel={true}
+            showDefaultInputIcon={true}
+            minimumNights={0}
+          />
+            </div>
+          </div>
+
           <div className="row">
             <HashtagWrapper hashtagArr={this.state.hashtagArr} />
             <PostsWrapper
@@ -305,6 +404,30 @@ class App extends Component {
               setPosts={this.setPosts}
             />
           </div>
+       
+          <div className="row">
+          <div className="col-md-12">
+         <div className="main-card mb-3 card">
+        <div className="card-body">
+          <table id="tabelaPosts" className="mb-0 table table-striped">
+            <thead>
+              <tr>
+                <th>Perfil</th>
+                <th>Publicações</th>
+                <th>Fotos</th>
+                <th>Carrossel</th>
+                <th>Vídeos</th>
+              </tr>
+            </thead>
+            <tbody>
+              {comparacoes}
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+    </div>
+          </div>
         </div>
     
       </div>
@@ -312,4 +435,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default Main;

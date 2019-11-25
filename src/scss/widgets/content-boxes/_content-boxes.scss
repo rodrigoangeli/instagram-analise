@@ -19,7 +19,7 @@ $widget-spacer: $spacer;
   .widget-content-left {
 
     .widget-heading {
-      opacity: .8;
+      color: rgba(darken($primary, 40%), .7);
       font-weight: bold;
     }
 

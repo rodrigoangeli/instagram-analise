@@ -13,7 +13,7 @@ export default class PostsWrapper extends Component {
       dados: this.props.dados,
       sortParams: { direction: undefined },
       currentPage: 1,
-      todosPerPage: 25,
+      todosPerPage: 15,
 		};
   }
 

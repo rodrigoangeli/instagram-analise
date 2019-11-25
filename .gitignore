@@ -13,6 +13,8 @@
 
 /rodar/*.json
 
+/rodar/*.txt
+
 # misc
 .DS_Store
 .env.local
@@ -23,3 +25,4 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+rodar/teste.txt
